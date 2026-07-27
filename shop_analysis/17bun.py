@@ -55,6 +55,7 @@ def ltv_distribution(order_items, products):
     return cust_ltv, dist_summary, top10_share
 
 
+
 if __name__ == "__main__":
     order_items = build_order_items()      # 정상건 orders / orders_items (취소/반품건 제외)
     products  = load_products()            # 상품 중복건 제거
