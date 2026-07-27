@@ -8,7 +8,7 @@
 """
 
 import pandas as pd
-from common_order_items import build_order_items
+from common_order_items import build_order_items, net_order_items
 
 pd.set_option("display.float_format", lambda x: f"{x:,.2f}")
 
@@ -20,13 +20,13 @@ def load_products():
     return pd.read_csv("data/products.csv").drop_duplicates()
 
 
-def build_net_with_margin(order_items, products):
+def order_items_margin(order_items, products):
     """순매출 라인에 원가(cost)를 붙여 라인별 마진을 파생한다."""
-    net = order_items.merge(products[["product_id", "cost"]], on="product_id", how="left")
-    net["margin"] = net["quantity"] * (
-        net["unit_price"] * (1 - net["discount"]) - net["cost"]
+    margin = order_items.merge(products[["product_id", "cost"]], on="product_id", how="left")
+    margin["margin"] = margin["quantity"] * (
+        margin["unit_price"] * (1 - margin["discount"]) - margin["cost"]
     )
-    return net
+    return margin
 
 
 def cohort_ltv_curve(net):
@@ -72,19 +72,19 @@ def margin_90d(net):
 
 
 if __name__ == "__main__":
-    order_items = build_order_items()
+    order_items = net_order_items()
     products = load_products()
-    net = build_net_with_margin(order_items, products)
+    order_items_margin = order_items_margin(order_items, products)
 
     print("=" * 70)
     print("문제 18. 코호트별 LTV 곡선과 획득비 상한")
     print("=" * 70)
 
-    curve, monthly = cohort_ltv_curve(net)
+    curve, monthly = cohort_ltv_curve(order_items_margin)
     print("\n[코호트별 누적 1인당 마진 곡선]")
     print(curve.round(0).to_string())
 
-    margin_90d_value, n_eligible = margin_90d(net)
+    margin_90d_value, n_eligible = margin_90d(order_items_margin)
     print(f"\n[90일 시점 1인당 평균 마진] {margin_90d_value:,.0f}원 (관측 완료 코호트 {n_eligible:,}명 대상)")
 
     print(
