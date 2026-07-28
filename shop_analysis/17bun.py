@@ -31,7 +31,7 @@ def ltv_distribution(order_items, products):
     cust_ltv = items_pro.groupby("customer_id").agg(
         매출LTV=("line_amount", "sum"), # line_amount(실구매가)
         마진LTV=("margin", "sum"),
-    )
+    )  
 
     def dist_stats(s):
         return pd.Series({

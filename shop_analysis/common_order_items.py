@@ -21,7 +21,7 @@ def build_order_items(
 
     orders = orders.drop_duplicates()
     items = items.drop_duplicates()
-
+  
     # print("items.shape[0] : ",items.shape[0], "라인 아이템 건수(중복제거)")
 
     orders["order_datetime"] = pd.to_datetime(orders["order_datetime"], errors="coerce")
